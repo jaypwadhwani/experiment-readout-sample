@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Weekly Experiment Readout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one readable memo column; recommendation first, then evidence, then the backlog and learnings a successor inherits */
+:root {
+  --bg: #f6f7f8; --paper: #ffffff; --fg: #1b2127; --muted: #5d6873; --rule: #dde2e7;
+  --accent: #1f5f73; --accent-soft: #e3eef2;
+  --win: #2c7a4b; --win-soft: #e2f1e7; --wait: #9a6b12; --wait-soft: #f7eed9;
+  --stop: #a63d3d; --stop-soft: #f6e3e3; --flat: #58626c; --flat-soft: #eceff2;
+  --display: "Newsreader", Georgia, serif; --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161a; --paper: #1a2026; --fg: #e4e8ec; --muted: #9aa5b0; --rule: #2d353d;
+  --accent: #7fbdd1; --accent-soft: #1d3440;
+  --win: #74c894; --win-soft: #1c3326; --wait: #e2b45a; --wait-soft: #3a2f17;
+  --stop: #e58a8a; --stop-soft: #3d2222; --flat: #a9b3bd; --flat-soft: #262d34; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161a; --paper: #1a2026; --fg: #e4e8ec; --muted: #9aa5b0; --rule: #2d353d;
+  --accent: #7fbdd1; --accent-soft: #1d3440;
+  --win: #74c894; --win-soft: #1c3326; --wait: #e2b45a; --wait-soft: #3a2f17;
+  --stop: #e58a8a; --stop-soft: #3d2222; --flat: #a9b3bd; --flat-soft: #262d34; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body); }
+.wrap { max-width: 860px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 64px; display: grid; gap: 36px; }
+header { display: grid; gap: 10px; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 600 clamp(30px, 5vw, 42px)/1.1 var(--display); margin: 0; text-wrap: balance; }
+h2 { font: 600 24px/1.2 var(--display); margin: 0 0 14px; text-wrap: balance; }
+h3 { font: 600 16px/1.3 var(--body); margin: 0; }
+p { margin: 0; max-width: 68ch; }
+.meta { color: var(--muted); font-size: 14px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.note { background: var(--accent-soft); border-radius: 6px; padding: 10px 14px; font-size: 13.5px; color: var(--fg); }
+.tldr { background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 22px 24px; display: grid; gap: 12px; }
+.tldr ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.tldr li { max-width: 72ch; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 500 11.5px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+.up { color: var(--win); } .down { color: var(--stop); }
+.chip { display: inline-block; font: 600 11px/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; padding: 5px 8px; border-radius: 4px; white-space: nowrap; }
+.chip.win { background: var(--win-soft); color: var(--win); }
+.chip.wait { background: var(--wait-soft); color: var(--wait); }
+.chip.stop { background: var(--stop-soft); color: var(--stop); }
+.chip.flat { background: var(--flat-soft); color: var(--flat); }
+.tests { display: grid; gap: 14px; }
+.test { background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 18px 20px; display: grid; gap: 10px; }
+.test-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
+.hyp { color: var(--muted); font-size: 14px; }
+.kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px 20px; }
+.kv div { min-width: 0; }
+.kv dt { font: 500 11px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.kv dd { margin: 2px 0 0; font-size: 14px; }
+.next { border-top: 1px dashed var(--rule); padding-top: 10px; font-size: 14px; }
+.next b { color: var(--accent); }
+figure { margin: 0; background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 18px 20px; display: grid; gap: 8px; }
+figcaption { font-size: 13px; color: var(--muted); }
+svg text { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+svg .lbl { font-family: var(--body); font-size: 12.5px; fill: var(--fg); }
+.ask { display: grid; gap: 10px; }
+.ask li { max-width: 72ch; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; display: grid; gap: 6px; font-size: 14px; }
+.card dt { font: 500 11px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.card dd { margin: 0; }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--rule); padding-top: 16px; }
+@media (max-width: 520px) { .tldr, .test, figure { padding: 16px; } th, td { padding: 8px 10px; } }
+</style>
+<style>body{margin:0}</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Weekly experiment readout · Week 38</div>
+    <h1>Pricing ships, two tests need more time, one is blocked</h1>
+    <div class="meta"><span>Consumer subscription app (name withheld)</span><span>Prepared by Jay Wadhwani, VP of Product</span><span>Sources: PostHog, Mixpanel, ChartMogul, billing</span></div>
+    <p class="note">Portfolio sample. This is a composite of real weekly readouts I wrote. The company name, people, feature names, and flag IDs are removed, and every figure has been changed. The structure, the statistical calls, and the decisions are real.</p>
+  </header>
+
+  <section class="tldr" aria-labelledby="tldr">
+    <h2 id="tldr">The short version</h2>
+    <ol>
+      <li><b>Ship tiered pricing to 90% of traffic and keep a 10% holdout.</b> Revenue per plans-page viewer is 3.9x control. Trial-to-paid is 2.7 points lower, inside our 3-point guardrail and within noise.</li>
+      <li><b>Nothing else is ready to call.</b> The recommendations test is flat so far and underpowered for the 2-point effect we planned for. Passwordless sign-up is 4 days old.</li>
+      <li><b>The landing-page test has not started.</b> Paid traffic never arrived, and the UTM tags don't match the test arms. Hold ad spend until the tags are fixed.</li>
+      <li><b>Top-of-funnel risk:</b> signup-to-trial is 13%, about half of May. It started falling before any of this week's tests and is the top item on the backlog.</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="funnel">
+    <h2 id="funnel">Funnel this week</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Stage</th><th class="r">This week</th><th class="r">4-week avg</th><th class="r">Change</th><th>Read</th></tr></thead>
+        <tbody>
+          <tr><td>Signups</td><td class="r">2,310</td><td class="r">2,450</td><td class="r down">−5.7%</td><td>Seasonal dip, in range</td></tr>
+          <tr><td>Signup → trial</td><td class="r">13.1%</td><td class="r">13.4%</td><td class="r down">−0.3 pt</td><td>Flat week, but half of May (24–26%)</td></tr>
+          <tr><td>Trial → paid (day 30, matured cohorts)</td><td class="r">56.2%</td><td class="r">55.0%</td><td class="r up">+1.2 pt</td><td>Healthy</td></tr>
+          <tr><td>Active paid subscribers</td><td class="r">7,960</td><td class="r">8,140</td><td class="r down">−2.2%</td><td>Base shrinking ~1% a week</td></tr>
+          <tr><td>Avg revenue per account</td><td class="r">$12.70</td><td class="r">$12.35</td><td class="r up">+2.8%</td><td>Up on price, not on volume</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="results">
+    <h2 id="results">Where each test stands</h2>
+    <figure>
+      <svg viewBox="0 0 640 196" width="100%" role="img" aria-label="Primary metric change versus control with 95% confidence intervals, in percentage points">
+        <g stroke="var(--rule)" stroke-width="1">
+          <line x1="230" y1="18" x2="230" y2="164"/><line x1="315" y1="18" x2="315" y2="164"/>
+          <line x1="485" y1="18" x2="485" y2="164"/><line x1="570" y1="18" x2="570" y2="164"/>
+        </g>
+        <line x1="400" y1="12" x2="400" y2="168" stroke="var(--muted)" stroke-width="1.5"/>
+        <line x1="349" y1="12" x2="349" y2="168" stroke="var(--stop)" stroke-width="1.2" stroke-dasharray="4 3"/>
+        <text x="353" y="22" style="fill: var(--stop)">−3 pt guardrail</text>
+        <text class="lbl" x="0" y="46">Tiered pricing: trial → paid</text>
+        <line x1="277.6" y1="42" x2="430.6" y2="42" stroke="var(--win)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="354.1" cy="42" r="5.5" fill="var(--win)"/>
+        <text class="lbl" x="0" y="82">Trial splash: paid in 21 days</text>
+        <line x1="362.6" y1="78" x2="437.4" y2="78" stroke="var(--flat)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="400" cy="78" r="5.5" fill="var(--flat)"/>
+        <text class="lbl" x="0" y="118">Recs redesign: trial in 3 days</text>
+        <line x1="323.5" y1="114" x2="459.5" y2="114" stroke="var(--wait)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="391.5" cy="114" r="5.5" fill="var(--wait)"/>
+        <text class="lbl" x="0" y="154">Feature teaser: trial in 3 days</text>
+        <line x1="308.2" y1="150" x2="447.6" y2="150" stroke="var(--stop)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="377.9" cy="150" r="5.5" fill="var(--stop)"/>
+        <g text-anchor="middle">
+          <text x="230" y="186">−10</text><text x="315" y="186">−5</text><text x="400" y="186">0</text>
+          <text x="485" y="186">+5</text><text x="570" y="186">+10</text>
+        </g>
+      </svg>
+      <figcaption>Change in each test's primary metric versus control, in percentage points, with 95% confidence intervals. Every interval crosses zero. Pricing wins on revenue (below), not on this conversion metric. Its point estimate sits inside the guardrail.</figcaption>
+    </figure>
+
+    <div class="tests" style="margin-top:14px">
+      <article class="test">
+        <div class="test-head"><h3>Tiered pricing ($20 / month, $60 / 4 months, $120 / year vs flat $10)</h3><span class="chip win">Ship to 90%</span></div>
+        <p class="hyp">If we offer longer, higher-priced plans, revenue per viewer rises without hurting trial-to-paid, because committed users prefer to pay once for a season.</p>
+        <dl class="kv">
+          <div><dt>Primary · revenue per viewer</dt><dd class="num">$5.30 vs $1.36 (3.9x)</dd></div>
+          <div><dt>Higher-tier take rate</dt><dd class="num">71% (bar: 60%)</dd></div>
+          <div><dt>Guardrail · trial → paid</dt><dd class="num">59.1% vs 61.8% (−2.7 pt, ±4.5)</dd></div>
+          <div><dt>Watch · LTV per viewer</dt><dd class="num">−4% vs control</dd></div>
+        </dl>
+        <p class="next"><b>Next:</b> Ramp to 90% with a 10% control on the new signup flow. The holdout costs about $10K a month and is the only way to separate a pricing effect from a funnel effect. A plan-selection fix ships next week to close the LTV gap. Go/no-go on 100% in 14 days.</p>
+      </article>
+
+      <article class="test">
+        <div class="test-head"><h3>Trial-start splash for the portfolio builder</h3><span class="chip flat">Keep, no revenue credit</span></div>
+        <p class="hyp">If new trialists see a splash that invites them to start a portfolio, more of them will do real work in the product and convert to paid.</p>
+        <dl class="kv">
+          <div><dt>Feature turn-on</dt><dd class="num">7% → 55%</dd></div>
+          <div><dt>Did real work</dt><dd class="num">78% vs 76% (flat)</dd></div>
+          <div><dt>Primary · paid in 21 days</dt><dd class="num">3.6% vs 3.6% (±2.2)</dd></div>
+          <div><dt>Sample</dt><dd class="num">~290 per arm, ~20 conversions each</dd></div>
+        </dl>
+        <p class="next"><b>Next:</b> Inconclusive on revenue and underpowered. The turn-on lift is mostly the splash asking the question. I'm not counting it as a win. Keep the splash since it costs nothing and helps adoption. Retention tracking for this test is broken; don't quote it until it's fixed.</p>
+      </article>
+
+      <article class="test">
+        <div class="test-head"><h3>Recommendations: redesign vs feature teaser vs control</h3><span class="chip wait">Too early</span></div>
+        <p class="hyp">If we show better next-step recommendations at the trial wall, more visitors start a trial within 3 days.</p>
+        <dl class="kv">
+          <div><dt>Control</dt><dd class="num">10.4% (n=438)</dd></div>
+          <div><dt>Redesign</dt><dd class="num">9.9% (−0.5 pt, ±4.0)</dd></div>
+          <div><dt>Feature teaser</dt><dd class="num">9.1% (−1.3 pt, ±4.1)</dd></div>
+          <div><dt>Mechanism</dt><dd>13% finished the teaser vs 35% who clicked the redesign CTA</dd></div>
+        </dl>
+        <p class="next"><b>Next:</b> At ~115 visitors per arm per day, the planned 2-week window can only detect a 3-point effect. Detecting 2 points takes about 30 days. Recommendation: stop the teaser arm now, because 87% of people never used it, and run the redesign for 30 days against control.</p>
+      </article>
+
+      <article class="test">
+        <div class="test-head"><h3>Passwordless sign-up</h3><span class="chip wait">Too early</span></div>
+        <p class="hyp">If people can sign up with an emailed code instead of a password, more of them finish sign-up.</p>
+        <dl class="kv">
+          <div><dt>Primary · sign-up completion</dt><dd>Flat after 4 days</dd></div>
+          <div><dt>Time to submit</dt><dd class="num">15s vs 38s</dd></div>
+          <div><dt>Time to verified</dt><dd class="num">40s vs 4m 50s</dd></div>
+        </dl>
+        <p class="next"><b>Next:</b> Speed is clearly better. Completion needs another 10 days before a read.</p>
+      </article>
+
+      <article class="test">
+        <div class="test-head"><h3>Landing-page variants for paid traffic</h3><span class="chip stop">Blocked</span></div>
+        <p class="hyp">If paid visitors land on a page matched to their ad, more of them sign up.</p>
+        <dl class="kv">
+          <div><dt>Traffic since launch</dt><dd>2 sign-up clicks; likely internal QA</dd></div>
+          <div><dt>Root cause</dt><dd>Campaign never went live; UTM tags don't match test arms</dd></div>
+        </dl>
+        <p class="next"><b>Next:</b> Fix the tagging before any spend. Otherwise the budget buys data we can't read.</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="quality">
+    <h2 id="quality">Data quality checks</h2>
+    <ul class="plain">
+      <li>Billing-derived trial events arrive in analytics 1–2 days late and backfill. Recent days are understated for every arm by the same amount. Comparisons stay fair, but absolute rates will rise.</li>
+      <li>Traffic split is healthy (chi-square p ≈ 0.16). One arm runs slightly light in both tools, which points to assignment, not tracking. Watching it.</li>
+      <li>Internal test accounts are still pinned to one arm of the recommendations test. They haven't entered the sample yet; removing them this week.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="asks">
+    <h2 id="asks">Decisions needed</h2>
+    <ol class="ask">
+      <li><b>Approve the 90 / 10 pricing ramp</b> starting Monday.</li>
+      <li><b>Recommendations test:</b> extend to 30 days to detect a 2-point effect, or accept a 3-point bar and call it on Sep 30. I recommend extending.</li>
+      <li><b>Hold paid landing-page spend</b> until tagging is verified.</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="backlog">
+    <h2 id="backlog">Backlog, re-ranked this week</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>#</th><th>Test</th><th>Metric</th><th>Impact</th><th>Confidence</th><th>Effort</th><th>Why it moved</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td>Diagnose the signup → trial drop (session replays, step-by-step funnel, cohort by channel)</td><td>Signup → trial</td><td>High</td><td>Med</td><td>Low</td><td>New. Largest gap in the funnel.</td></tr>
+          <tr><td class="num">2</td><td>Plan-selection page fix</td><td>LTV per viewer</td><td>High</td><td>High</td><td>Low</td><td>Needed before pricing goes to 100%</td></tr>
+          <tr><td class="num">3</td><td>Show plan prices before the trial wall</td><td>Signup → trial</td><td>Med</td><td>Med</td><td>Med</td><td>Up two. Support tickets show price surprise.</td></tr>
+          <tr><td class="num">4</td><td>Recommendations redesign, 30-day run</td><td>Trial in 3 days</td><td>Med</td><td>Low</td><td>Low</td><td>Teaser arm cut</td></tr>
+          <tr><td class="num">5</td><td>Paid landing-page variants</td><td>Paid signup rate</td><td>Med</td><td>Med</td><td>Low</td><td>Blocked on tagging</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="learn">
+    <h2 id="learn">Added to the learnings library</h2>
+    <div class="cards">
+      <dl class="card">
+        <h3>Tiered pricing</h3>
+        <dt>Hypothesis</dt><dd>Longer plans lift revenue per viewer without hurting conversion.</dd>
+        <dt>Result</dt><dd>3.9x first-payment revenue per viewer; conversion within guardrail.</dd>
+        <dt>Takeaway</dt><dd>Our users pay for a season, not a month. Track LTV per viewer, not just take rate, since plan choice can hide a drag.</dd>
+      </dl>
+      <dl class="card">
+        <h3>Feature teaser at the trial wall</h3>
+        <dt>Hypothesis</dt><dd>A hands-on teaser pulls visitors into a trial.</dd>
+        <dt>Result</dt><dd>87% never engaged with it; primary metric flat.</dd>
+        <dt>Takeaway</dt><dd>When the mechanism doesn't fire, stop the arm. More sample won't fix low engagement.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <footer>Portfolio sample by Jay Wadhwani. All figures are changed and the company is not named. Format: summary and asks first, then per-test evidence with confidence intervals, data-quality notes, backlog changes, and learnings for whoever owns the program next.</footer>
+</div>
+</body>
+</html>
